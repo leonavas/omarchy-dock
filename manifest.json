@@ -1,0 +1,123 @@
+{
+  "schemaVersion": 1,
+  "id": "leonavas.dock",
+  "name": "Dock",
+  "version": "1.0.0",
+  "author": "leonavas",
+  "license": "MIT",
+  "description": "The programs open in the current workspace, drawn with their real icons, in the center of the bar.",
+  "kinds": [
+    "bar-widget"
+  ],
+  "entryPoints": {
+    "barWidget": "Dock.qml"
+  },
+  "barWidget": {
+    "displayName": "Dock",
+    "description": "Icons for the windows open in the current workspace, in the order they sit on screen. Left click focuses, middle/right closes, the wheel walks the row.",
+    "category": "Compositor",
+    "aliases": [
+      "dock",
+      "taskbar",
+      "windows",
+      "apps",
+      "tasks"
+    ],
+    "allowMultiple": false,
+    "defaultSection": "center",
+    "defaults": {
+      "scope": "Current workspace",
+      "order": "Screen order",
+      "groupByApp": false,
+      "iconSize": 18,
+      "gap": 2,
+      "activeIndicator": true,
+      "dimInactive": true,
+      "hideWhenEmpty": true,
+      "rightClickCloses": true
+    },
+    "schema": [
+      {
+        "key": "scope",
+        "type": "enum",
+        "label": "Which windows to show",
+        "options": [
+          "Current workspace",
+          "Current monitor",
+          "All windows"
+        ],
+        "defaultValue": "Current workspace",
+        "description": "\"Current workspace\" follows the active workspace of the monitor the bar is drawn on."
+      },
+      {
+        "key": "order",
+        "type": "enum",
+        "label": "Icon order",
+        "options": [
+          "Screen order",
+          "Open order",
+          "By application"
+        ],
+        "defaultValue": "Screen order",
+        "description": "Screen order follows the layout: swapping windows around (SUPER + SHIFT + arrows) swaps the icons along with them. Open order keeps the sequence the windows were opened in. By application sorts by window class, leaving every icon in the same slot forever."
+      },
+      {
+        "key": "groupByApp",
+        "type": "boolean",
+        "label": "Group windows of the same application",
+        "defaultValue": false,
+        "description": "A single icon per application, with the window count in the corner. Clicking cycles through them."
+      },
+      {
+        "key": "iconSize",
+        "type": "integer",
+        "label": "Icon size (px)",
+        "min": 10,
+        "max": 32,
+        "step": 1,
+        "defaultValue": 18
+      },
+      {
+        "key": "gap",
+        "type": "integer",
+        "label": "Space between icons (px)",
+        "min": 0,
+        "max": 16,
+        "step": 1,
+        "defaultValue": 2
+      },
+      {
+        "key": "activeIndicator",
+        "type": "boolean",
+        "label": "Mark the focused window",
+        "defaultValue": true,
+        "description": "A dash on the bar edge under the icon of the focused window."
+      },
+      {
+        "key": "dimInactive",
+        "type": "boolean",
+        "label": "Dim the windows that are not focused",
+        "defaultValue": true
+      },
+      {
+        "key": "hideWhenEmpty",
+        "type": "boolean",
+        "label": "Disappear when the workspace is empty",
+        "defaultValue": true
+      },
+      {
+        "key": "rightClickCloses",
+        "type": "boolean",
+        "label": "Right click also closes the window",
+        "defaultValue": true,
+        "description": "Turn off to leave closing on the middle button only."
+      },
+      {
+        "key": "iconOverrides",
+        "type": "object",
+        "label": "Manual icons per window class",
+        "description": "A window class → icon name or path map, for apps without a .desktop entry. E.g. {\"org.omarchy.agent\": \"omarchy\"}."
+      }
+    ]
+  }
+}
