@@ -34,7 +34,8 @@
       "activeIndicator": true,
       "dimInactive": true,
       "hideWhenEmpty": true,
-      "rightClickCloses": true
+      "rightClickCloses": true,
+      "hoverLabel": "App name"
     },
     "schema": [
       {
@@ -87,6 +88,19 @@
         "defaultValue": 2
       },
       {
+        "key": "hoverLabel",
+        "type": "enum",
+        "label": "Name shown on hover",
+        "options": [
+          "App name",
+          "App name and title",
+          "Window title",
+          "Off"
+        ],
+        "defaultValue": "App name",
+        "description": "A label floating on the free side of the bar - above the icons when the bar is at the bottom. \"Off\" falls back to the shell's standard tooltip."
+      },
+      {
         "key": "activeIndicator",
         "type": "boolean",
         "label": "Mark the focused window",
@@ -111,6 +125,12 @@
         "label": "Right click also closes the window",
         "defaultValue": true,
         "description": "Turn off to leave closing on the middle button only."
+      },
+      {
+        "key": "nameOverrides",
+        "type": "object",
+        "label": "Manual names per window class",
+        "description": "A window class \u2192 name map, for anything the dock names badly. E.g. {\"chrome-web.whatsapp.com__-Default\": \"WhatsApp\"}."
       },
       {
         "key": "iconOverrides",

@@ -18,7 +18,8 @@ with the tiles.
 - Order mirrors the layout: left to right, then top to bottom.
 - The focused window stands out (a dash on the bar edge plus a fully opaque
   icon); the rest are dimmed.
-- Hovering shows the app name and the window title.
+- Hovering names the icon: a label floats on the free side of the bar —
+  above the icons when the bar sits at the bottom.
 - Disappears from the bar when the workspace is empty (can be turned off).
 
 ## Interactions
@@ -29,6 +30,51 @@ with the tiles.
 | Middle click | Close the window |
 | Right click | Close the window (can be turned off) |
 | Scroll wheel | Walk through the workspace's windows |
+
+## The hover label
+
+The name of the app under the pointer, in a bubble on the free side of the bar
+— above the icons on a bottom bar, below them on a top one, beside them on a
+vertical one. One bubble serves the whole row: it travels from icon to icon as
+the pointer moves instead of fading out and back in between slots, and the
+first one waits out ~110 ms so sweeping across the dock does not strobe a label
+for every icon on the way. A grouped icon carries its window count in the name
+(`Ghostty (3)`).
+
+### What the icons are called
+
+The name comes from the window class, which is usually enough
+(`org.gnome.Nautilus` → Nautilus, `brave-browser` → Brave browser). Web apps
+are the exception: Chromium names their window after the URL, so WhatsApp
+opened with `omarchy-launch-webapp` arrives as
+`chrome-web.whatsapp.com__-Default` — where the last dot-segment, the part a
+reverse-DNS class normally hides its name in, is the browser profile.
+
+Those are recognised and resolved through the `.desktop` file they were
+launched from, matched on the URL its `Exec` line opens — the only place the
+name the user gave them exists (`messages.google.com` → **Google Messages**,
+not "Google"). Its icon is taken from the same entry. With no entry to be
+found, the site itself names the icon: `web.whatsapp.com` → **Whatsapp**.
+
+To fix any name by hand, use `nameOverrides`:
+
+```json
+{
+  "id": "leonavas.dock",
+  "nameOverrides": {
+    "chrome-web.whatsapp.com__-Default": "WhatsApp"
+  }
+}
+```
+
+What the label says is the `hoverLabel` setting:
+
+| Value | Label |
+|---|---|
+| `App name` (default) | `Brave` |
+| `App name and title` | `Brave` with the window title under it, dimmed |
+| `Window title` | `GitHub — leonavas/dock` (the app name, when the window has no title) |
+| `Off` | No label; the shell's standard tooltip takes over, as before |
 
 ## Icon order
 
@@ -71,7 +117,8 @@ Through the shell's plugin panel, or directly in `~/.config/omarchy/shell.json`:
   "activeIndicator": true,
   "dimInactive": true,
   "hideWhenEmpty": true,
-  "rightClickCloses": true
+  "rightClickCloses": true,
+  "hoverLabel": "App name"
 }
 ```
 
@@ -86,6 +133,8 @@ Through the shell's plugin panel, or directly in `~/.config/omarchy/shell.json`:
 | `dimInactive` | `true` | Dims the windows that are not focused |
 | `hideWhenEmpty` | `true` | Disappears from the bar when there are no windows |
 | `rightClickCloses` | `true` | Turn off to leave closing on the middle button only |
+| `hoverLabel` | `App name` | What the hover label says, see [The hover label](#the-hover-label) |
+| `nameOverrides` | — | Window class → name map, see [What the icons are called](#what-the-icons-are-called) |
 | `iconOverrides` | — | Window class → icon map, see below |
 
 The widget goes into the bar through the `center` section of `shell.json` (it
@@ -117,8 +166,8 @@ To force an icon, use `iconOverrides` (a theme name, or an absolute path —
 
 | File | Contents |
 |---|---|
-| `Dock.qml` | The widget: layout, icons, clicks, the re-read timer |
-| `Model.js` | Pure helpers: ordering, grouping, names, icon candidates |
+| `Dock.qml` | The widget: layout, icons, clicks, the hover label, the re-read timer |
+| `Model.js` | Pure helpers: ordering, grouping, names, web app classes, icon candidates |
 | `manifest.json` | Metadata, settings, and defaults read by the shell's panel |
 
 ## Notes

@@ -39,6 +39,69 @@ function trim(value) {
   return String(value || "").replace(/^\s+|\s+$/g, "")
 }
 
+// Chromium, and everything built on it, names a web app window after the URL
+// it was opened with: "chrome-web.whatsapp.com__-Default" is web.whatsapp.com
+// running in the Default profile, with every character a window class cannot
+// carry turned into an underscore. The reverse-DNS rule in prettyName() reads
+// that backwards and ends up calling it "Com Default", so the shape is pulled
+// apart before it gets there.
+var WEB_APP_CLASS = /^(?:chrome|chromium|google-chrome|brave|brave-browser|microsoft-edge|msedge|edge|opera|vivaldi|helium|thorium)-(.+)-([A-Za-z0-9_ .]+)$/
+
+// The site a web app window belongs to, or null for anything that is not one.
+// `token` is what the browser put in the class - a host, sometimes with a path
+// glued on, or the extension id of an installed app; `host` is only filled in
+// when the token really is a hostname, which is what makes the guess safe: a
+// browser's own window ("brave-browser") never reaches here, and neither does
+// a class that merely happens to start with one of these names.
+function webAppTarget(appId) {
+  var match = trim(appId).match(WEB_APP_CLASS)
+  if (!match) return null
+
+  var token = match[1]
+  var host = token.split("__")[0].replace(/_+$/, "")
+  if (host.indexOf(".") < 1) host = ""
+
+  return { token: token, host: host.toLowerCase(), profile: match[2] }
+}
+
+// The hostname in a URL an Exec line opens, for matching a web app window
+// against the .desktop entry it was launched from.
+function execHost(exec) {
+  var match = String(exec || "").match(/https?:\/\/([^\/\s"'\\]+)/)
+  if (!match) return ""
+  return match[1].toLowerCase().replace(/:\d+$/, "")
+}
+
+// Second-level suffixes that are part of the public suffix rather than of the
+// name: "example.co.uk" is Example, not Co.
+var PUBLIC_SECOND_LEVEL = ({ co: true, com: true, net: true, org: true, gov: true, edu: true, ac: true })
+
+// "web.whatsapp.com" -> "Whatsapp". The label in front of the public suffix is
+// the one carrying the name; what sits in front of that is a section of the
+// site ("web.", "app.", "mail."), and the suffix itself says nothing.
+function prettyHost(host) {
+  var labels = trim(host).toLowerCase().split(".")
+  while (labels.length > 1 && labels[labels.length - 1].length > 0) {
+    labels.pop()
+    if (labels.length > 1 && PUBLIC_SECOND_LEVEL[labels[labels.length - 1]]) continue
+    break
+  }
+
+  var value = labels[labels.length - 1] || trim(host)
+  if (value.length === 0) return "?"
+  value = value.replace(/[-_]+/g, " ")
+  return value.charAt(0).toUpperCase() + value.slice(1)
+}
+
+// A name the user wrote themselves, from a .desktop entry or an override, is
+// left as it is - except for the first letter, because a dock row of names
+// reads badly when one of them starts lowercase.
+function capitalize(value) {
+  var text = trim(value)
+  if (text.length === 0) return ""
+  return text.charAt(0).toUpperCase() + text.slice(1)
+}
+
 // "org.gnome.Nautilus" -> "Nautilus", "brave-browser" -> "Brave browser".
 function prettyName(appId) {
   var value = trim(appId)
