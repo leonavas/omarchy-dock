@@ -21,6 +21,8 @@ with the tiles.
 - Hovering names the icon: a label floats on the free side of the bar —
   above the icons when the bar sits at the bottom.
 - Disappears from the bar when the workspace is empty (can be turned off).
+- Web apps (WhatsApp, Google Messages, …) get their real name and icon, not
+  `Chrome-web.whatsapp.com`.
 
 ## Interactions
 
@@ -29,7 +31,7 @@ with the tiles.
 | Left click | Focus the window (with grouping on, cycles through the app's windows) |
 | Middle click | Close the window |
 | Right click | Close the window (can be turned off) |
-| Scroll wheel | Walk through the workspace's windows |
+| Scroll wheel | Move focus to the next or previous window in the row |
 
 ## The hover label
 
@@ -102,9 +104,10 @@ quickshell process: **~0.4% CPU** (roughly 4 ms per second); the re-read
 repaints nothing when nothing moved. In the other two modes the timer never
 runs.
 
-## Configuration
+## Settings
 
-Through the shell's plugin panel, or directly in `~/.config/omarchy/shell.json`:
+Set these in Setup > Plugins, or inline on the widget's entry in
+`~/.config/omarchy/shell.json`:
 
 ```json
 {
@@ -122,24 +125,24 @@ Through the shell's plugin panel, or directly in `~/.config/omarchy/shell.json`:
 }
 ```
 
-| Setting | Default | What it does |
+| Key | Default | What it does |
 |---|---|---|
 | `scope` | `Current workspace` | `Current workspace`, `Current monitor` or `All windows` |
 | `order` | `Screen order` | See [Icon order](#icon-order) |
 | `groupByApp` | `false` | One icon per app, with the window count in the corner |
 | `iconSize` | `18` | Icon size, in px (10–32) |
-| `gap` | `2` | Space between icons, in px |
-| `activeIndicator` | `true` | Dash on the bar edge under the focused window |
-| `dimInactive` | `true` | Dims the windows that are not focused |
-| `hideWhenEmpty` | `true` | Disappears from the bar when there are no windows |
-| `rightClickCloses` | `true` | Turn off to leave closing on the middle button only |
+| `gap` | `2` | Space between icons, in px (0–16) |
 | `hoverLabel` | `App name` | What the hover label says, see [The hover label](#the-hover-label) |
+| `activeIndicator` | `true` | A short line on the bar edge under the focused window |
+| `dimInactive` | `true` | Dims the windows that are not focused |
+| `hideWhenEmpty` | `true` | Hides the dock when there are no windows to show |
+| `rightClickCloses` | `true` | Turn off to close windows with the middle button only |
 | `nameOverrides` | — | Window class → name map, see [What the icons are called](#what-the-icons-are-called) |
 | `iconOverrides` | — | Window class → icon map, see below |
 
-The widget goes into the bar through the `center` section of `shell.json` (it
-is this configuration's `centerAnchor`), or with `omarchy bar move
-leonavas.dock --section center`.
+Changes apply as soon as `shell.json` is saved, overrides included.
+
+To find a window's class, focus it and run `hyprctl activewindow | grep class`.
 
 ### Icons for apps without a `.desktop`
 
@@ -149,7 +152,7 @@ the icon theme using the class and its segments (`org.omarchy.agent` →
 frame. A generic theme icon is never accepted as a hit — if nothing specific
 exists, the initial shows up.
 
-To force an icon, use `iconOverrides` (a theme name, or an absolute path —
+To force an icon, use `iconOverrides` (a theme icon name, or an absolute path —
 `~` is not expanded):
 
 ```json
@@ -162,6 +165,75 @@ To force an icon, use `iconOverrides` (a theme name, or an absolute path —
 }
 ```
 
+## Requirements
+
+- Omarchy with the Quickshell-based shell (`omarchy-shell`)
+- Hyprland
+
+No other dependency. The widget talks to Hyprland through Quickshell's built-in
+Hyprland integration and reads `.desktop` entries through Quickshell; it runs
+no external commands.
+
+## Install
+
+```bash
+omarchy plugin add https://github.com/leonavas/omarchy-dock.git
+omarchy plugin enable leonavas.dock --section center
+```
+
+It is meant for the center of the bar; `omarchy bar move leonavas.dock
+--section left` (or `right`) puts it elsewhere.
+
+## Update
+
+```bash
+omarchy plugin update leonavas.dock
+```
+
+The update shows the diff before applying it. Run `omarchy restart shell`
+afterwards so widgets already on the bar pick up the new code.
+
+## Remove
+
+```bash
+omarchy plugin disable leonavas.dock   # off the bar, files kept
+omarchy plugin remove leonavas.dock    # deletes ~/.config/omarchy/plugins/leonavas.dock/
+```
+
+Disabling drops the widget's entry, with its settings, from
+`~/.config/omarchy/shell.json`. Nothing else is left behind.
+
+## What it writes
+
+Nothing. The widget never writes a file: no `shell.json` changes of its own,
+nothing under `~/.config/hypr/`, no cache on disk. Its settings are only
+changed by you, through Setup > Plugins or by editing `shell.json`.
+
+What it does at runtime:
+
+- Reads the window list from Hyprland, and re-reads it every 250 ms in
+  `Screen order` mode (see [Why screen order polls](#why-screen-order-polls)).
+- Reads installed `.desktop` entries and the icon theme, for names and icons.
+- Focuses or closes a window when you click its icon — the same requests a
+  window manager keybinding would send. Closing asks the app to close; it can
+  still show its own "unsaved changes" prompt.
+
+Nothing is read from the network, and no sudo or pkexec is required.
+
+## Troubleshooting
+
+- **An app shows a letter instead of an icon.** It has no `.desktop` entry and
+  no theme icon matching its class. Add it to `iconOverrides`.
+- **An app has an odd name.** Add its window class to `nameOverrides`.
+- **Icons do not follow a window swap right away.** Only `Screen order` tracks
+  the layout; check the `order` setting.
+- **Right click closed a window by accident.** Turn off `rightClickCloses`.
+- **The dock is missing.** With `hideWhenEmpty` on, it hides on an empty
+  workspace. Otherwise check it is on the bar: `omarchy plugin enable
+  leonavas.dock --section center`.
+- **Code changes do not show up.** Editing the QML reloads the plugin, but
+  widgets already on the bar keep the old code until `omarchy restart shell`.
+
 ## Files
 
 | File | Contents |
@@ -170,14 +242,6 @@ To force an icon, use `iconOverrides` (a theme name, or an absolute path —
 | `Model.js` | Pure helpers: ordering, grouping, names, web app classes, icon candidates |
 | `manifest.json` | Metadata, settings, and defaults read by the shell's panel |
 
-## Notes
-
-- `shell.json` reloads on save: setting changes apply immediately.
-- Editing the QML reloads the plugin code, but widgets already mounted on the
-  bar keep the previous version — run `omarchy restart shell` to see the
-  changes.
-
 ## License
 
-MIT — see [`LICENSE`](LICENSE). Do whatever you want with it; it comes with no
-warranty and no support.
+MIT — see [LICENSE](LICENSE). Comes with no warranty and no support.

@@ -2,10 +2,10 @@
   "schemaVersion": 1,
   "id": "leonavas.dock",
   "name": "Dock",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "author": "leonavas",
   "license": "MIT",
-  "description": "The programs open in the current workspace, drawn with their real icons, in the center of the bar.",
+  "description": "Icons for the windows open in the current workspace, in the same order they sit on screen, in the center of the bar.",
   "kinds": [
     "bar-widget"
   ],
@@ -14,7 +14,7 @@
   },
   "barWidget": {
     "displayName": "Dock",
-    "description": "Icons for the windows open in the current workspace, in the order they sit on screen. Left click focuses, middle/right closes, the wheel walks the row.",
+    "description": "Icons for the windows open in the current workspace, in the order they sit on screen. Left click focuses, middle or right click closes, the wheel moves focus along the row.",
     "category": "Compositor",
     "aliases": [
       "dock",
@@ -48,7 +48,7 @@
           "All windows"
         ],
         "defaultValue": "Current workspace",
-        "description": "\"Current workspace\" follows the active workspace of the monitor the bar is drawn on."
+        "description": "\"Current workspace\" follows the active workspace of the monitor this bar is on. \"Current monitor\" shows every window on that monitor. \"All windows\" shows every window on every monitor."
       },
       {
         "key": "order",
@@ -60,14 +60,14 @@
           "By application"
         ],
         "defaultValue": "Screen order",
-        "description": "Screen order follows the layout: swapping windows around (SUPER + SHIFT + arrows) swaps the icons along with them. Open order keeps the sequence the windows were opened in. By application sorts by window class, leaving every icon in the same slot forever."
+        "description": "\"Screen order\" follows the layout, left to right: swap two windows (SUPER + SHIFT + arrows) and their icons swap too. \"Open order\" keeps the order the windows were opened in. \"By application\" sorts alphabetically by app, so each app always sits in the same place."
       },
       {
         "key": "groupByApp",
         "type": "boolean",
         "label": "Group windows of the same application",
         "defaultValue": false,
-        "description": "A single icon per application, with the window count in the corner. Clicking cycles through them."
+        "description": "One icon per application, with the window count in the corner. Clicking the icon cycles through its windows."
       },
       {
         "key": "iconSize",
@@ -98,25 +98,25 @@
           "Off"
         ],
         "defaultValue": "App name",
-        "description": "A label floating on the free side of the bar - above the icons when the bar is at the bottom. \"Off\" falls back to the shell's standard tooltip."
+        "description": "A small label on the free side of the bar (above the icons when the bar is at the bottom). \"Off\" uses the shell's standard tooltip instead."
       },
       {
         "key": "activeIndicator",
         "type": "boolean",
         "label": "Mark the focused window",
         "defaultValue": true,
-        "description": "A dash on the bar edge under the icon of the focused window."
+        "description": "A short line on the bar edge under the focused window's icon."
       },
       {
         "key": "dimInactive",
         "type": "boolean",
-        "label": "Dim the windows that are not focused",
+        "label": "Dim windows that are not focused",
         "defaultValue": true
       },
       {
         "key": "hideWhenEmpty",
         "type": "boolean",
-        "label": "Disappear when the workspace is empty",
+        "label": "Hide the dock when there are no windows to show",
         "defaultValue": true
       },
       {
@@ -124,19 +124,19 @@
         "type": "boolean",
         "label": "Right click also closes the window",
         "defaultValue": true,
-        "description": "Turn off to leave closing on the middle button only."
+        "description": "Turn off to close windows with the middle button only."
       },
       {
         "key": "nameOverrides",
         "type": "object",
-        "label": "Manual names per window class",
-        "description": "A window class \u2192 name map, for anything the dock names badly. E.g. {\"chrome-web.whatsapp.com__-Default\": \"WhatsApp\"}."
+        "label": "Custom names per window class",
+        "description": "Maps a window class to the name shown for it, for apps the dock names badly. Example: {\"chrome-web.whatsapp.com__-Default\": \"WhatsApp\"}. Find a window's class with `hyprctl clients`."
       },
       {
         "key": "iconOverrides",
         "type": "object",
-        "label": "Manual icons per window class",
-        "description": "A window class → icon name or path map, for apps without a .desktop entry. E.g. {\"org.omarchy.agent\": \"omarchy\"}."
+        "label": "Custom icons per window class",
+        "description": "Maps a window class to an icon theme name or an absolute file path (~ is not expanded), for apps without a .desktop entry. Example: {\"org.omarchy.agent\": \"omarchy\"}."
       }
     ]
   }

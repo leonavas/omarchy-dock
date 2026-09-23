@@ -28,6 +28,11 @@ BarWidget {
   readonly property var iconOverrides: setting("iconOverrides", ({}))
   readonly property var nameOverrides: setting("nameOverrides", ({}))
 
+  // Names and icons are memoized per class, so an override edited in
+  // shell.json would otherwise only show up after a shell restart.
+  onNameOverridesChanged: root.nameCache = ({})
+  onIconOverridesChanged: root.iconCache = ({})
+
   // What the hover label says. "Off" hands hovering back to the shell's own
   // tooltip, which is what the widget did before the label existed.
   readonly property string hoverLabel: String(setting("hoverLabel", "App name"))
