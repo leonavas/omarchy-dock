@@ -505,7 +505,6 @@ BarWidget {
         spacing: Style.space(1)
 
         Text {
-
           textFormat: Text.PlainText
           width: Math.min(implicitWidth, root.labelMaxWidth)
           text: root.labelPrimary
@@ -518,7 +517,6 @@ BarWidget {
         }
 
         Text {
-
           textFormat: Text.PlainText
           visible: text.length > 0
           width: Math.min(implicitWidth, root.labelMaxWidth)
@@ -647,7 +645,6 @@ BarWidget {
         border.color: Qt.rgba(root.foreground.r, root.foreground.g, root.foreground.b, 0.45)
 
         Text {
-
           textFormat: Text.PlainText
           anchors.centerIn: parent
           text: item.label.charAt(0).toUpperCase()
