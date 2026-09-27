@@ -1,5 +1,7 @@
 # leonavas.dock
 
+![The dock in the bar, hovering Ghostty](preview.png)
+
 A bar widget for the Omarchy shell: it shows the programs open in the current
 workspace as small icons — **always in the same order they sit on screen**,
 even after you rearrange the windows. The point is not losing track of what is
