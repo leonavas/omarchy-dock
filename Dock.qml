@@ -505,6 +505,8 @@ BarWidget {
         spacing: Style.space(1)
 
         Text {
+
+          textFormat: Text.PlainText
           width: Math.min(implicitWidth, root.labelMaxWidth)
           text: root.labelPrimary
           color: Color.tooltip.text
@@ -516,6 +518,8 @@ BarWidget {
         }
 
         Text {
+
+          textFormat: Text.PlainText
           visible: text.length > 0
           width: Math.min(implicitWidth, root.labelMaxWidth)
           text: root.labelSecondary
@@ -643,6 +647,8 @@ BarWidget {
         border.color: Qt.rgba(root.foreground.r, root.foreground.g, root.foreground.b, 0.45)
 
         Text {
+
+          textFormat: Text.PlainText
           anchors.centerIn: parent
           text: item.label.charAt(0).toUpperCase()
           color: root.foreground
@@ -655,6 +661,7 @@ BarWidget {
 
     // Window count for a grouped app, tucked into the corner of the slot.
     Text {
+      textFormat: Text.PlainText
       visible: item.windowCount > 1
       anchors.right: iconSlot.right
       anchors.bottom: iconSlot.bottom
